@@ -1,6 +1,4 @@
-﻿const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const { model, Schema } = require("mongoose"); // Erase if already required
+﻿const { model, Schema } = require("mongoose"); // Erase if already required
 const COLLECTION_NAME = "Food";
 // Declare the Schema of the Mongo model
 const foodSchema = new Schema(
@@ -25,6 +23,10 @@ const foodSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    food_description: {
+      type: String,
+      maxlength: 100,
+    },
     food_ratingAverage: {
       type: Number,
       default: 4,
@@ -37,19 +39,33 @@ const foodSchema = new Schema(
       ref: "Customer",
       default: [],
     },
+    food_typeId: {
+      type: Schema.Types.ObjectId,
+      ref: "FoodType",
+      required: [true, "Please provide type food"],
+    },
+    food_shopId: {
+      type: Schema.Types.ObjectId,
+      ref: "Shop",
+      required: [true, "Please provide shop Id of food"],
+    },
     isDraft: {
       type: Boolean,
       default: true,
+      select: false,
     },
     isPublish: {
       type: Boolean,
       default: false,
+      select: false,
     },
   },
   {
     timestamps: true,
   }
 );
+
+foodSchema.index({ food_name: "text", food_description: "text" });
 
 //Export the model
 module.exports = model(COLLECTION_NAME, foodSchema);

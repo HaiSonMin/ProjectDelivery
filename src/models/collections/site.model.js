@@ -1,48 +1,32 @@
-﻿const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const { model, Schema } = require("mongoose"); // Erase if already required
+﻿const { model, Schema } = require("mongoose"); // Erase if already required
 const COLLECTION_NAME = "Site";
 // Declare the Schema of the Mongo model
 const siteSchema = new Schema(
   {
-    firstName: {
+    site_name: {
       type: String,
-      required: [true, "Please provide firstName"],
+      required: [true, "Please provide site name "],
       maxlength: 50,
     },
-    lastName: {
+    site_description: {
       type: String,
-      required: [true, "Please provide lastName"],
       maxlength: 50,
     },
-    email: {
+    site_contact_info: {
       type: String,
-      match: [
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        ,
-        "Please provide valid email",
-      ],
-      unique: true,
-      required: [true, "Please provide email"],
       maxlength: 50,
     },
-    userName: {
+    site_address: {
       type: String,
-      required: [true, "Please provide user name"],
+      required: [true, "Please provide address"],
+      maxlength: 50,
     },
-    password: {
-      type: String,
-      required: [true, "Please provide password"],
+    site_shopId: {
+      type: Schema.Types.ObjectId,
+      ref:"Shop",
+      required: [true, "Please provide Shop Id"],
     },
-    role: {
-      type: String,
-      required: [true, "Please provide password"],
-      enum: ["SHOP", "CUSTOMER", "ADMIN"],
-    },
-    shopActive: {
-      type: Boolean,
-      default: false,
-    },
+  
   },
   {
     timestamps: true,

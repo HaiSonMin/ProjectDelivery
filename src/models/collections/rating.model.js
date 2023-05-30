@@ -1,5 +1,4 @@
-﻿const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+﻿
 const { model, Schema } = require("mongoose"); // Erase if already required
 const COLLECTION_NAME = "Rating";
 // Declare the Schema of the Mongo model
@@ -19,6 +18,16 @@ const ratingSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Customer",
       required: [true, "Please provide customer id has been rated"],
+    },
+    rating_shopId: {
+      type: Schema.Types.ObjectId,
+      ref: "Shop",
+      required: [true, "Please provide shop id"],
+    },
+    rating_foodId: {
+      type: Schema.Types.ObjectId,
+      ref: "Food",
+      required: [true, "Please provide food id"],
     },
   },
   {

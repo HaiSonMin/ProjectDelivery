@@ -1,6 +1,7 @@
 ﻿const bcrypt = require("bcrypt");
 const { model, Schema } = require("mongoose"); // Erase if already required
 const COLLECTION_NAME = "Shop";
+const crypto = require('crypto')
 // Declare the Schema of the Mongo model
 const shopSchema = new Schema(
   {
@@ -18,6 +19,7 @@ const shopSchema = new Schema(
       type: String,
       unique: [true, "Phone number has exist"],
       maxlength: 20,
+      trim: true
     },
     shop_email: {
       type: String,
@@ -42,6 +44,19 @@ const shopSchema = new Schema(
     shop_password: {
       type: String,
       required: [true, "Please provide shop password"],
+      trim: true
+    },
+    shop_passwordResetSecretKey: {
+      type: String,
+      select: false
+    },
+    shop_passwordResetExpires: {
+      type: String,
+      select: false
+    },
+    shop_isActive: {
+      type: Boolean,
+      default: true
     },
     shop_ratingPoint: {
       type: Number,
@@ -72,6 +87,28 @@ shopSchema.pre("save", async function (next) {
 shopSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.shop_password);
 };
+shopSchema.methods.createPasswordChanged = function () {
+  const resetSecret = crypto.randomBytes(64).toString('hex');
 
-//Export the model
-module.exports = model(COLLECTION_NAME, shopSchema);
+  this.shop_passwordResetSecretKey = crypto.createHash('sha256').update(resetSecret).digest('hex');
+  this.shop_passwordResetExpires = Date.now() + 5 * 60 * 1000; // Time expires is 5minute
+  return resetSecret;
+},
+
+  // shopSchema.methods = {
+  //   comparePassword: async function (password) {
+  //     return await bcrypt.compare(password, this.shop_password);
+  //   },
+
+  //   createPasswordChanged: function () {
+  //     const resetSecret = crypto.randomBytes(64).toString('hex');
+
+  //     this.shop_passwordResetToken = crypto.createHash('sha256').update(resetSecret).digest('hex');
+  //     this.shop_passwordResetExpires = Date.now() + 5 * 60 * 1000; // Time expires is 5minute
+  //     return resetSecret;
+  //   },
+
+  // }
+
+  //Export the model
+  module.exports = model(COLLECTION_NAME, shopSchema);

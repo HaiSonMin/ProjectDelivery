@@ -33,6 +33,11 @@ class KeyTokenService {
     if (!tokenDeleted) throw new NotFoundError("Token dost not exist");
     return tokenDeleted;
   }
+  static async deleteTokenByRefreshToken(refreshToken) {
+    const tokenDeleted = await KeyTokenModel.findOneAndDelete({ refreshTokenUsing:refreshToken });
+    if (!tokenDeleted) throw new NotFoundError("Token dost not exist");
+    return tokenDeleted;
+  }
   static async findRefreshTokenUsed(refreshToken) {
     const token = await KeyTokenModel.findOne({ refreshTokenUsed: refreshToken });
     if (!token) throw new NotFoundError("Token dost not exist");

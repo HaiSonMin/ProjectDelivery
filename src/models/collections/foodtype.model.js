@@ -5,20 +5,20 @@ const COLLECTION_NAME = "FoodType";
 // Declare the Schema of the Mongo model
 const foodTypeSchema = new Schema(
   {
-    menutype_name: {
+    foodType_name: {
       type: String,
       required: [true, "Please provide menutype name "],
       maxlength: 50,
     },
-    menutype_description: {
+    foodType_description: {
       type: String,
-      required: [true, "Please provide menutype name "],
-      maxlength: 50,
+      required: [true, "Please provide description name "],
+      maxlength: 100,
     },
-    menutype_foodBelong: {
-      type: [Schema.Types.ObjectId],
-      ref: "Food",
-      default: [],
+    foodType_shopId: {
+      type: Schema.Types.ObjectId,
+      ref: "Shop",
+      required: [true, "Please provide shop Id of food"],
     },
   },
   {

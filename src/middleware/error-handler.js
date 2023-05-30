@@ -10,18 +10,18 @@ const errorHandlerMiddleware = function (err, req, res, next) {
   // if (err instanceof CustomErrorApi) return res.status(err.statusCode).json({ message: err.message });
 
   // Email have exist
-  if (err.code || err.code === 11000) {
-    customError.message = `Duplicate email, please enter email other than ${err.keyValue.email}`;
-    customError.statusCode = StatusCodes.BAD_REQUEST;
-  }
+  // if (err.code || err.code === 11000) {
+  //   customError.message = `Duplicate email, please enter email other than ${err.keyValue?.email}`;
+  //   customError.statusCode = StatusCodes.BAD_REQUEST;
+  // }
 
   // Enter miss name, email, password
   if (err.name === "ValidationError") {
-    customError.message =
-      "Please provide " +
-      Object.values(err.errors)
-        .map((item) => item.message.split(" ")[2])
-        .join(", ");
+    customError.message =err.errors
+      // "Please provide " +
+      // Object.values(err.errors)
+      //   .map((item) => item.message.split(" ")[1][2])
+      //   .join(", ");
     customError.statusCode = StatusCodes.BAD_REQUEST;
   }
 

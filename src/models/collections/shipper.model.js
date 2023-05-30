@@ -1,5 +1,4 @@
-﻿const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+﻿
 const { model, Schema } = require("mongoose"); // Erase if already required
 const COLLECTION_NAME = "Shipper";
 // Declare the Schema of the Mongo model
