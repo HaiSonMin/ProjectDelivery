@@ -73,22 +73,8 @@ const getFoodBySearchField = async ({ keySearch, limit, page }) => {
     .exec();
   return results;
 };
-// const queryFood = async ({ keySearch }) => {
-//   const regexSearch = new RegExp(keySearch, "i");
-//   const results = await FoodModel.find(
-//     {
-//       isPublished: true,
-//       $text: { $search: regexSearch },
-//     },
-//     { score: { $meta: "textScore" } }
-//   )
-//     .sort({ score: { $meta: "textScore" } })
-//     .lean()
-//     .exec();
-//   return results;
-// };
 
-const updateFoodIsDraftToPublish = async ({ Food_shopId, Food_id }) => {
+const updateFoodIsDraftToPublish = async ({ food_shopId, food_id }) => {
   const Food = await FoodModel.findOne({ Food_shopId, _id: Food_id });
   if (!Food) throw new NotFoundError("Not Found Food");
 
@@ -99,7 +85,7 @@ const updateFoodIsDraftToPublish = async ({ Food_shopId, Food_id }) => {
   const { modifiedCount } = await Food.updateOne(Food);
   return modifiedCount;
 };
-const updateFoodIsPublishedToDraft = async ({ Food_shopId, Food_id }) => {
+const updateFoodIsPublishedToDraft = async ({ food_shopId, food_id }) => {
   const Food = await FoodModel.findOne({ Food_shopId, _id: Food_id });
   if (!Food) throw new NotFoundError("Not Found Food");
 
@@ -111,12 +97,16 @@ const updateFoodIsPublishedToDraft = async ({ Food_shopId, Food_id }) => {
   return modifiedCount;
 };
 
-const updateFoodById = async ({ Food_id, payload, Model, isNew = true }) => {
-  return await Model.findOneAndUpdate({ _id: Food_id }, payload, {
+const updateFoodById = async ({ food_id, payload, Model, isNew = true }) => {
+  return await Model.findOneAndUpdate({ _id: food_id }, payload, {
     new: isNew,
     runValidators: true,
   });
 };
+
+const deleteAllFoodByShopId = async ({ shopId }) => {
+  return await FoodModel.deleteMany({ food_shopId: shopId }).lean().exec();
+}
 
 module.exports = {
   getFoodById,
@@ -128,4 +118,5 @@ module.exports = {
   updateFoodById,
   updateFoodIsDraftToPublish,
   updateFoodIsPublishedToDraft,
+  deleteAllFoodByShopId
 };

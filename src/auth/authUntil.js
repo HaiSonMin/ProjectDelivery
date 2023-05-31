@@ -9,8 +9,8 @@ const HEADERS = {
   REFRESH_TOKEN: "x-rtoken-id",
 };
 const createTokenPair = async (payload, privateKey, publicKey) => {
-  const accessToken = JWT.sign(payload, publicKey, { expiresIn: "2d" });
-  const refreshToken = JWT.sign(payload, privateKey, { expiresIn: "7d" });
+  const accessToken = JWT.sign(payload, publicKey, { expiresIn: "10m" });
+  const refreshToken = JWT.sign(payload, privateKey, { expiresIn: "3d" });
 
   JWT.verify(accessToken, publicKey, (err, decode) => {
     if (err) console.log(`Error verify::: ${err}`);
@@ -27,10 +27,10 @@ const authentication = async (req, res, next) => {
 
   // const userId = req.headers[HEADERS.CLIENT_ID];
 
-  const {refreshToken} = req.cookies
-  if(!refreshToken) throw new BadRequestError("refreshToken doesn't exist on cookies");
+  const { refreshToken } = req.cookies
+  if (!refreshToken) throw new BadRequestError("refreshToken doesn't exist on cookies");
 
-  const keyStore = await KeyTokenModel.findOne({ refreshTokenUsing:refreshToken });
+  const keyStore = await KeyTokenModel.findOne({ refreshTokenUsing: refreshToken });
   if (!keyStore) throw new ForbiddenError("KeyStore invalid");
 
   const payload = JWT.verify(accessToken.split(" ")[1], keyStore.publicKey);
@@ -41,7 +41,21 @@ const authentication = async (req, res, next) => {
   return next();
 };
 
+const checkAuthIsShop = async (req, res, next) => {
+  await authentication(req, res, next);
+  const { role } = req.user;
+  if(role !== "SHOP") throw new UnauthenticatedError("You don't have enough permission visit here");
+}
+
+const checkAuthIsAdmin = async (req, res, next) => {
+  await authentication(req, res, next);
+  const { role } = req.user;
+  if(role !== "ADMIN") throw new UnauthenticatedError("You don't have enough permission visit here");
+}
+
 module.exports = {
   createTokenPair,
   authentication,
+  checkAuthIsShop,
+  checkAuthIsAdmin
 };

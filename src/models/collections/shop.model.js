@@ -15,6 +15,11 @@ const shopSchema = new Schema(
       required: [true, "Please provide shop lastName"],
       maxlength: 50,
     },
+    shop_role: {
+      type: String,
+      enum: ["USER", "SHOP", "ADMIN"],
+      default: "USER",
+    },
     shop_phoneNumber: {
       type: String,
       unique: [true, "Phone number has exist"],
@@ -31,11 +36,6 @@ const shopSchema = new Schema(
       unique: true,
       required: [true, "Please provide email"],
       maxlength: 50,
-    },
-    shop_role: {
-      type: String,
-      enum: ["SHOP", "ADMIN"],
-      default: "SHOP",
     },
     shop_userName: {
       type: String,
@@ -58,6 +58,9 @@ const shopSchema = new Schema(
       type: Boolean,
       default: true
     },
+    shop_address: {
+      type: String,
+    },
     shop_ratingPoint: {
       type: Number,
       default: 4,
@@ -79,36 +82,42 @@ const shopSchema = new Schema(
   }
 );
 
+shopSchema.index({ shop_email: "text", shop_userName: "text" })
+
 shopSchema.pre("save", async function (next) {
   this.shop_password = await bcrypt.hash(this.shop_password, 10);
   next();
 });
 
-shopSchema.methods.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.shop_password);
-};
-shopSchema.methods.createPasswordChanged = function () {
-  const resetSecret = crypto.randomBytes(64).toString('hex');
+// shopSchema.virtual('discountedPrice').get(function() {
+//   return this.price >= 100 ? this.price * 0.9 : this.price;
+// });
 
-  this.shop_passwordResetSecretKey = crypto.createHash('sha256').update(resetSecret).digest('hex');
-  this.shop_passwordResetExpires = Date.now() + 5 * 60 * 1000; // Time expires is 5minute
-  return resetSecret;
-},
+// shopSchema.methods.comparePassword = async function (password) {
+//   return await bcrypt.compare(password, this.shop_password);
+// };
+// shopSchema.methods.createPasswordChanged = function () {
+//   const resetSecret = crypto.randomBytes(64).toString('hex');
 
-  // shopSchema.methods = {
-  //   comparePassword: async function (password) {
-  //     return await bcrypt.compare(password, this.shop_password);
-  //   },
+//   this.shop_passwordResetSecretKey = crypto.createHash('sha256').update(resetSecret).digest('hex');
+//   this.shop_passwordResetExpires = Date.now() + 5 * 60 * 1000; // Time expires is 5minute
+//   return resetSecret;
+// },
 
-  //   createPasswordChanged: function () {
-  //     const resetSecret = crypto.randomBytes(64).toString('hex');
+shopSchema.methods = {
+  comparePassword: async function (password) {
+    return await bcrypt.compare(password, this.shop_password);
+  },
 
-  //     this.shop_passwordResetToken = crypto.createHash('sha256').update(resetSecret).digest('hex');
-  //     this.shop_passwordResetExpires = Date.now() + 5 * 60 * 1000; // Time expires is 5minute
-  //     return resetSecret;
-  //   },
+  createPasswordChanged: function () {
+    const resetSecret = crypto.randomBytes(64).toString('hex');
 
-  // }
+    this.shop_passwordResetToken = crypto.createHash('sha256').update(resetSecret).digest('hex');
+    this.shop_passwordResetExpires = Date.now() + 5 * 60 * 1000; // Time expires is 5minute
+    return resetSecret;
+  },
 
-  //Export the model
-  module.exports = model(COLLECTION_NAME, shopSchema);
+}
+
+//Export the model
+module.exports = model(COLLECTION_NAME, shopSchema);

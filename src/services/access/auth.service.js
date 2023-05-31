@@ -5,23 +5,28 @@ const crypto = require('crypto')
 const bcrypt = require('bcrypt')
 const createKeys = require("../../utils/createKey.util");
 const KeyTokenService = require("./keytoken.service");
-const { getInfoData } = require("../../utils");
+const { getInfoData } = require("../../utils/index");
 const JWT = require("jsonwebtoken");
-const { findShopByEmail, mathSecretToken } = require("../../models/Repositories/shop.repo");
+const { findShopByEmail, mathSecretTokenShop } = require("../../models/Repositories/shop.repo");
 const sendMail = require("../../utils/sendMail.util");
+const AdminService = require("../shop/admin.service");
 class AuthShopService {
   // Admin will create the Shop
-  static async signUp({ firstName, lastName, userName, email, password, phoneNumber, role }) {
-    const newShop = await ShopModel.create({
+  static async signUpShop(req, res) {
+    return await AdminService.createShop(req, res);
+  }
+
+  static async signUpUser(req, res) {
+    const { firstName, lastName, userName, email, password, phoneNumber } = req.body;
+    const newUser = await ShopModel.create({
       shop_firstName: firstName,
       shop_lastName: lastName,
       shop_userName: userName,
       shop_email: email,
       shop_password: password,
-      shop_phoneNumber: phoneNumber,
-      shop_role: role,
+      shop_phoneNumber: phoneNumber
     });
-    if (newShop) {
+    if (newUser) {
       //   const { privateKey, publicKey } = createKeys();
 
       //   const { _id: shopId, shop_userName, shop_email, shop_role } = newShop;
@@ -33,11 +38,12 @@ class AuthShopService {
       //   // Create tokens (AT vs RT)
       //   const tokenPair = await createTokenPair({ userId: shopId, userName: shop_userName, email: shop_email, role: shop_role }, privateKey, publicKey);
       return {
-        shop: getInfoData(newShop, ["shop_firstName", "shop_lastName", "shop_userName", "shop_email"]),
+        auth: getInfoData(newUser, ["shop_firstName", "shop_lastName", "shop_userName", "shop_email"]),
       };
     }
     throw new BadRequestError("SignUp Error");
   }
+
 
   /**
     1. Login with email, password
@@ -173,7 +179,7 @@ class AuthShopService {
 
     const encodeSecretToken = crypto.createHash('sha256').update(secretToken).digest('hex');
 
-    const shop = await mathSecretToken(encodeSecretToken)
+    const shop = await mathSecretTokenShop(encodeSecretToken)
 
     if (!shop) throw new BadRequestError("Secret Token don't matching")
 

@@ -13,7 +13,6 @@ const {
 
 const { authentication } = require("../auth/authUntil");
 
-
 router.use(authentication);
 router.route("/").post(createDiscount);
 router.route("/").get(getAllDiscount);

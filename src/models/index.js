@@ -1,4 +1,3 @@
-const UserModel = require("./collections/user.model");
 const FoodModel = require("./collections/food.model");
 const FoodTypeModel = require("./collections/foodtype.model");
 const DiscountModel = require("./collections/discount.model");
@@ -14,7 +13,6 @@ const SiteModel = require("./collections/site.model");
 
 module.exports = {
   KeyTokenModel,
-  UserModel,
   FoodModel,
   FoodTypeModel,
   DiscountModel,
